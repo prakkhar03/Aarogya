@@ -65,7 +65,7 @@ class PendingVerificationsView(APIView):
                 "report_id": v.report.id,
                 "report_file": v.report.file.url if v.report.file else None,
                 "report_text": v.report.extracted_text,
-                "report_analysis": v.report.ai_analysis,
+                "report_analysis": v.report.analysis,
                 "created_at": v.appointment.created_at
             })
             

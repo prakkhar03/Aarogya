@@ -60,7 +60,7 @@ const DoctorPortal = () => {
 
   const fetchPendingVerifications = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/agents/pending/`, {
+      const res = await axios.get(`${API_BASE_URL}/pending/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingList(res.data);
@@ -83,12 +83,10 @@ const DoctorPortal = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Report ${action} successfully!`);
-      setVerificationStatus(prev => ({ ...prev, [selectedItem.id]: action }));
+      setVerificationStatus(prev => ({ ...prev, [selectedItem.token]: action }));
     } catch (err) {
-      console.warn("Verification failed (expected with mock token)", err);
-      // Fallback for demo purposes since we don't have real tokens yet
-      toast.success(`[Demo] Report ${action}!`);
-      setVerificationStatus(prev => ({ ...prev, [selectedItem.id]: action }));
+      console.warn("Verification failed", err);
+      toast.error(`Verification failed`);
     } finally {
       setLoading(false);
     }

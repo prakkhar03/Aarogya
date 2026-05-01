@@ -259,7 +259,7 @@ const PatientDashboard = () => {
                                     const appointmentId = prebookRes.data.appointment_id;
 
                                     // 2. Share with Doctor (Verification)
-                                    const shareRes = await axios.post(`${API_BASE_URL}/agents/share/${appointmentId}/`, {}, {
+                                    const shareRes = await axios.post(`${API_BASE_URL}/share/${appointmentId}/`, {}, {
                                       headers: { Authorization: `Bearer ${token}` }
                                     });
                                     

@@ -25,7 +25,8 @@
 
 .upload-section, .results-section {
   padding: 2.5rem;
-  height: 500px;
+  min-height: 500px;
+  height: auto;
   display: flex;
   flex-direction: column;
 }
