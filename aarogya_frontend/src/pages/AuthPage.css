@@ -301,12 +301,7 @@
     flex-direction: column;
   }
   .auth-left {
-    width: 100%;
-    min-height: 280px;
-    padding: 2rem;
-  }
-  .auth-left h1 {
-    font-size: 2rem;
+    display: none;
   }
   .auth-right {
     width: 100%;

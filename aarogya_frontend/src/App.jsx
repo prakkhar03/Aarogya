@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './hooks/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
 import Loader from './components/Loader';
@@ -26,6 +27,8 @@ const AppContent = () => {
   return (
     <>
       {showLoader && <Loader onComplete={handleLoaderDone} />}
+
+      <Toaster position="top-right" />
 
       {!hideNavbar && <Navbar />}
 

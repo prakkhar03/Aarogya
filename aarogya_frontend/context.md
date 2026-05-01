@@ -38,11 +38,9 @@
 | `GET /api/auth/me/` | `useAuth.jsx` (hydration) | ✅ Connected |
 | `POST /api/symptoms/chat/` | `SymptomTriage.jsx` | ✅ Connected (w/ fallback) |
 | `POST /api/reports/upload/` | `PatientDashboard.jsx` | ✅ Connected (w/ fallback) |
-| `GET /api/reports/` | `PatientDashboard.jsx` | 🔲 Pending |
-| `POST /api/verify/<token>/` | `DoctorPortal.jsx` | 🔲 Frontend-only mock |
-| `POST /api/share/<id>/` | — | 🔲 Not started |
+| `GET /api/reports/` | `PatientDashboard.jsx` | ✅ Connected |
+| `POST /api/verify/<token>/` | `DoctorPortal.jsx` | ✅ Connected (w/ mock data list) |
+| `POST /api/share/<id>/` | `PatientDashboard.jsx` | ✅ Connected (w/ mock ID) |
 
 ## Pending Frontend Tasks
-- Wire `DoctorPortal` to real `api/verify/<token>/` when tokens are available.
-- Wire report list endpoint (`GET /api/reports/`) to show history.
 - Admin/Prompt Config deferred to future sprint.

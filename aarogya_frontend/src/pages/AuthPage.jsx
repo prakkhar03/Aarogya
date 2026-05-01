@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
+import toast from 'react-hot-toast';
 import './AuthPage.css';
 
 const AuthPage = () => {
@@ -11,7 +12,6 @@ const AuthPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
@@ -44,21 +44,22 @@ const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setSubmitting(true);
 
     try {
       let assignedRole;
       if (mode === 'login') {
         assignedRole = await login(username, password);
+        toast.success(`Welcome back, ${username}!`);
       } else {
         assignedRole = await register(username, password, role);
+        toast.success(`Account created successfully!`);
       }
       // Role-based redirect
       navigate(assignedRole === 'doctor' ? '/doctor' : '/dashboard');
     } catch (err) {
       const msg = err.response?.data?.error || 'Something went wrong. Please try again.';
-      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -105,13 +106,13 @@ const AuthPage = () => {
           <div className="auth-tabs">
             <button
               className={`auth-tab ${mode === 'login' ? 'active' : ''}`}
-              onClick={() => { setMode('login'); setError(''); }}
+              onClick={() => setMode('login')}
             >
               Login
             </button>
             <button
               className={`auth-tab ${mode === 'signup' ? 'active' : ''}`}
-              onClick={() => { setMode('signup'); setError(''); }}
+              onClick={() => setMode('signup')}
             >
               Sign Up
             </button>
@@ -173,8 +174,6 @@ const AuthPage = () => {
                 </button>
               </div>
             </div>
-
-            {error && <div className="auth-error">{error}</div>}
 
             <button type="submit" className="auth-submit" disabled={submitting}>
               {submitting ? (

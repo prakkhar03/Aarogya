@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import './SymptomTriage.css';
 
@@ -40,31 +41,20 @@ const SymptomTriage = () => {
         payload.session_id = sessionId;
       }
 
-      // Mocking the response if the backend is not running or auth fails
-      // We wrap it in a try-catch and provide a fallback for demo purposes
-      let replyText = "";
-      let newSessionId = sessionId;
-
-      try {
-        const response = await axios.post(`${API_BASE_URL}/symptoms/chat/`, payload, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        replyText = response.data.reply;
-        newSessionId = response.data.session_id;
-      } catch (apiError) {
-        console.warn("API Error (using fallback for demo):", apiError);
-        // Fallback demo response
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        replyText = "Based on your symptoms, this seems to be a mild case. However, I recommend booking an appointment or uploading a medical report for a more accurate diagnosis.";
-        newSessionId = sessionId || Math.floor(Math.random() * 1000);
-      }
+      const response = await axios.post(`${API_BASE_URL}/symptoms/chat/`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const replyText = response.data.reply;
+      const newSessionId = response.data.session_id;
 
       setSessionId(newSessionId);
       setMessages(prev => [...prev, { id: Date.now(), text: replyText, sender: 'bot' }]);
 
     } catch (error) {
       console.error("Error sending message:", error);
-      setMessages(prev => [...prev, { id: Date.now(), text: "Sorry, I encountered an error. Please try again.", sender: 'bot', isError: true }]);
+      toast.error("Failed to connect to triage agent. Please try again.");
+      setMessages(prev => [...prev, { id: Date.now(), text: "Sorry, I encountered an error connecting to the agent.", sender: 'bot', isError: true }]);
     } finally {
       setLoading(false);
     }

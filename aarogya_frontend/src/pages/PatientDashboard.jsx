@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { UploadCloud, FileText, CheckCircle, BrainCircuit } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, BrainCircuit, Share2, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 import AgentReasoningPanel from '../components/AgentReasoningPanel';
+import AnimatedDNA from '../components/AnimatedDNA';
 import { useAuth } from '../hooks/useAuth';
 import './PatientDashboard.css';
 
@@ -13,6 +15,23 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [sharing, setSharing] = useState(false);
+
+  React.useEffect(() => {
+    fetchHistory();
+  }, [token]);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/reports/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setHistory(res.data);
+    } catch (err) {
+      console.error("Failed to fetch reports", err);
+    }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -28,35 +47,19 @@ const PatientDashboard = () => {
     formData.append('file', file);
 
     try {
-      
-      let responseData;
-      try {
-        const response = await axios.post(`${API_BASE_URL}/reports/upload/`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        responseData = response.data;
-      } catch (apiError) {
-        console.warn("API Error (using fallback):", apiError);
-        // Fallback for demonstration
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        responseData = {
-          report_id: 123,
-          analysis: {
-            summary: "Blood test shows elevated cholesterol levels. Patient requires dietary modifications.",
-            findings: { cholesterol: "240 mg/dL", hdl: "35 mg/dL" },
-            recommendation: "Consult Doctor for statin therapy if diet fails."
-          }
-        };
-      }
-
-      setResult(responseData);
+      const response = await axios.post(`${API_BASE_URL}/reports/upload/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setResult(response.data);
+      toast.success("Report analyzed successfully!");
       setPanelOpen(true);
+      fetchHistory(); // Refresh list
     } catch (error) {
       console.error("Error uploading file", error);
-      alert("Failed to upload report");
+      toast.error("Failed to upload report. Please check the file and try again.");
     } finally {
       setLoading(false);
     }
@@ -115,9 +118,11 @@ const PatientDashboard = () => {
             </div>
 
             {loading ? (
-              <div className="loading-state">
-                <div className="loader-inner-circle spin" style={{ backgroundColor: 'var(--primary)' }}></div>
-                <p>AI is processing your document...</p>
+              <div className="loading-state" style={{ position: 'relative', overflow: 'hidden' }}>
+                <div style={{ transform: 'scale(0.5)', width: '100%', height: '200px', position: 'relative' }}>
+                  <AnimatedDNA />
+                </div>
+                <p style={{ marginTop: '-40px', zIndex: 10 }}>AI is processing your document...</p>
               </div>
             ) : result ? (
               <div className="result-content">
@@ -132,7 +137,26 @@ const PatientDashboard = () => {
                 </div>
 
                 <div className="result-actions">
-                  <button className="btn-primary w-100">Send to Doctor for Verification</button>
+                  <button 
+                    className="btn-primary w-100" 
+                    onClick={async () => {
+                      setSharing(true);
+                      try {
+                        // Using a dummy appointment ID 1 for now
+                        const res = await axios.post(`${API_BASE_URL}/share/1/`, {}, {
+                          headers: { Authorization: `Bearer ${token}` }
+                        });
+                        toast.success(`Verification sent to Doctor! (Token: ${res.data.token})`);
+                      } catch (err) {
+                        toast.error("Failed to send to doctor. Ensure an appointment exists.");
+                      } finally {
+                        setSharing(false);
+                      }
+                    }}
+                    disabled={sharing}
+                  >
+                    {sharing ? "Sending..." : <><Share2 size={18}/> Send to Doctor for Verification</>}
+                  </button>
                 </div>
               </div>
             ) : (
@@ -143,6 +167,33 @@ const PatientDashboard = () => {
             )}
           </div>
         </div>
+
+        {/* History Section */}
+        {history.length > 0 && (
+          <div className="history-section mt-5">
+            <h3>Recent Reports</h3>
+            <div className="history-grid mt-3">
+              {history.map(item => (
+                <div key={item.id} className="history-card glass-card">
+                  <div className="history-card-header">
+                    <Clock size={20} color="var(--primary)" />
+                    <span>Report #{item.id}</span>
+                  </div>
+                  <p className="history-date">{new Date(item.created_at).toLocaleDateString()}</p>
+                  <button 
+                    className="btn-outline w-100 mt-3"
+                    onClick={() => {
+                      setResult({ report_id: item.id, analysis: item.analysis });
+                      setPanelOpen(true);
+                    }}
+                  >
+                    View Analysis
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <AgentReasoningPanel 
