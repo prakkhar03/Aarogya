@@ -1,0 +1,81 @@
+.dna-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 480px;
+}
+
+.dna-helix {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: rotate(-18deg);
+  position: relative;
+  z-index: 2;
+}
+
+.dna-pair {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 14px;
+}
+
+.helix-dot-l,
+.helix-dot-r {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
+.helix-dot-l {
+  left: 0;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+}
+
+.helix-dot-r {
+  right: 0;
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+/* Connecting bar */
+.helix-bar {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.6), rgba(6, 182, 212, 0.6));
+  border-radius: 3px;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* Ambient glow */
+.dna-glow {
+  position: absolute;
+  width: 300px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .dna-scene {
+    min-height: 350px;
+  }
+  .dna-helix {
+    transform: rotate(-18deg) scale(0.75);
+  }
+}
