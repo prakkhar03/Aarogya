@@ -1,12 +1,22 @@
 from langgraph.graph import StateGraph
 from doctors.models import Doctor
 
+from services.ai_service import call_ai
+
 def report_node(state):
-    state["analysis"] = {
-        "summary": "High sugar detected",
-        "severity": "medium",
-        "doctor_type": "Endocrinologist"
-    }
+    text = state.get("report_text", "")
+
+    if not text:
+        return {
+            "analysis": {
+                "summary": "No text found",
+                "severity": "unknown",
+                "doctor_type": "General Physician"
+            }
+        }
+
+    result = call_ai(text)
+    state["analysis"] = result
     return state
 
 def triage_node(state):
@@ -36,5 +46,5 @@ def build_graph():
 
 graph = build_graph()
 
-def run_orchestrator():
-    return graph.invoke({})
+def run_orchestrator(state):
+    return graph.invoke(state)
