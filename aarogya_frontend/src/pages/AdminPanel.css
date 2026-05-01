@@ -1,0 +1,105 @@
+.admin-page {
+  padding-top: 120px;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.admin-header {
+  margin-bottom: 2rem;
+}
+
+.admin-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.config-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  height: calc(100vh - 250px);
+  min-height: 600px;
+}
+
+.panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1e1e1e; /* VS Code dark theme look */
+}
+
+.editor-sidebar {
+  width: 250px;
+  background-color: #252526;
+  border-right: 1px solid #3c3c3c;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-item {
+  padding: 0.75rem 1.5rem;
+  color: #cccccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.sidebar-item:hover {
+  background-color: #2a2d2e;
+}
+
+.sidebar-item.active {
+  background-color: #37373d;
+  color: white;
+  border-left: 3px solid var(--primary);
+}
+
+.editor-main {
+  flex: 1;
+  position: relative;
+}
+
+.yaml-editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: #d4d4d4;
+  border: none;
+  padding: 1.5rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  resize: none;
+}
+
+.yaml-editor:focus {
+  outline: none;
+}
+
+.warning-banner {
+  margin-top: 1.5rem;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #92400e;
+  font-weight: 500;
+}

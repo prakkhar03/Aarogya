@@ -1,0 +1,168 @@
+.agent-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 450px;
+  height: 100vh;
+  background-color: #111827; /* Dark theme for the technical panel */
+  color: #e5e7eb;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #374151;
+}
+
+.agent-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #374151;
+  background-color: #1f2937;
+}
+
+.agent-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.agent-panel-title h3 {
+  color: #f9fafb;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close-btn {
+  background: transparent;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.close-btn:hover {
+  background-color: #374151;
+  color: white;
+}
+
+.agent-panel-content {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.system-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  background-color: #1f2937;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #10b981; /* Green */
+}
+
+.reasoning-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.reasoning-stream::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #374151;
+  z-index: 0;
+}
+
+.stream-step {
+  display: flex;
+  gap: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+.step-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #1f2937;
+  border: 2px solid #374151;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.stream-step.completed .step-icon {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.stream-step.active .step-icon {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+}
+
+.step-content {
+  flex: 1;
+  background-color: #1f2937;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #374151;
+}
+
+.step-content strong {
+  display: block;
+  color: #f9fafb;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.step-content p {
+  color: #d1d5db;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.code-block {
+  background-color: #111827;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 0.75rem;
+  overflow-x: auto;
+}
+
+.code-block pre {
+  margin: 0;
+  color: #a78bfa; /* purple for JSON keys */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .agent-panel {
+    width: 100%;
+  }
+}
