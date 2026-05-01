@@ -1,13 +1,21 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from .models import Report
+
 from agents.orchestrator import run_orchestrator
+from utils.permissions import IsPatient
+
+from .models import Report
 from .utils import extract_text_from_pdf
 
+import json
+
+
+def make_json_safe(data):
+    return json.loads(json.dumps(data, default=str))
+
+
 class UploadReportView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsPatient]
 
     def post(self, request):
         file = request.FILES.get("file")
@@ -15,29 +23,26 @@ class UploadReportView(APIView):
         if not file:
             return Response({"error": "file required"}, status=400)
 
-        report = Report.objects.create(
-            user=request.user,
-            file=file
-        )
+        report = Report.objects.create(user=request.user, file=file)
 
         text = extract_text_from_pdf(file)
         report.extracted_text = text
 
-        result = run_orchestrator({
-            "report_text": text
-        })
+        result = run_orchestrator({"report_text": text})
 
-        report.analysis = result
+        safe_result = make_json_safe(result)
+
+        report.analysis = safe_result
         report.save()
 
         return Response({
             "report_id": report.id,
-            "analysis": result
+            "analysis": safe_result
         })
 
 
 class ReportListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsPatient]
 
     def get(self, request):
         reports = Report.objects.filter(user=request.user)

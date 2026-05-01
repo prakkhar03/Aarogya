@@ -1,31 +1,40 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import DoctorVerification
+
 from bookings.models import Appointment
+from utils.permissions import IsDoctor, IsPatient
+
+from .models import DoctorVerification
+
 
 class ShareView(APIView):
-    permission_classes = [IsAuthenticated]
+    """Patient shares their report with a doctor via a one-time token."""
+    permission_classes = [IsPatient]
 
     def post(self, request, appointment_id):
-        appointment = get_object_or_404(Appointment, id=appointment_id)
+        appointment = get_object_or_404(Appointment, id=appointment_id, user=request.user)
 
         verification = DoctorVerification.objects.create(
             report=appointment.report,
-            appointment=appointment
+            appointment=appointment,
         )
 
         return Response({"token": str(verification.token)})
 
 
 class VerifyView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsDoctor]
 
     def post(self, request, token):
         verification = get_object_or_404(DoctorVerification, token=token)
 
         action = request.data.get("action")
+        if action not in ("approved", "rejected"):
+            return Response(
+                {"error": "action must be 'approved' or 'rejected'"},
+                status=400,
+            )
 
         verification.status = action
         verification.save()
@@ -34,6 +43,4 @@ class VerifyView(APIView):
         appointment.status = "confirmed" if action == "approved" else "cancelled"
         appointment.save()
 
-        return Response({
-            "status": appointment.status
-        })
+        return Response({"status": appointment.status})
