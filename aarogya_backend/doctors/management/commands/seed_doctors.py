@@ -1,56 +1,61 @@
-# doctors/management/commands/seed_doctors.py
-
 from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
+from django.db import transaction
 from doctors.models import Doctor
+from users.models import UserProfile
 import random
 
+
 class Command(BaseCommand):
-    help = "Seed database with doctors"
+    help = "Reset and seed 50 doctors with same password (idempotent)"
 
     def handle(self, *args, **kwargs):
+        PASSWORD = "doctor123"
 
         specializations = [
-            "Endocrinologist",
             "Cardiologist",
             "Dermatologist",
+            "Endocrinologist",
             "Neurologist",
             "Orthopedic",
-            "General Physician",
-            "Pediatrician"
+            "Pediatrician",
+            "Psychiatrist",
+            "General Physician"
         ]
 
-        first_names = [
-            "Amit", "Rahul", "Karan", "Rohit", "Vikas",
-            "Ankit", "Suresh", "Deepak", "Manoj", "Arjun",
-            "Vivek", "Rajesh", "Nitin", "Harsh", "Yash"
+        names = [
+            "Amit Sharma", "Rohit Verma", "Karan Singh", "Ankit Gupta",
+            "Rahul Mehta", "Vikas Jain", "Sandeep Kumar", "Nikhil Agarwal",
+            "Arjun Yadav", "Manish Tiwari", "Deepak Mishra", "Pankaj Saxena",
+            "Abhishek Singh", "Harsh Vardhan", "Yash Sharma", "Aditya Verma",
+            "Varun Khanna", "Mohit Gupta", "Shubham Jain", "Rajat Sharma"
         ]
 
-        last_names = [
-            "Sharma", "Verma", "Gupta", "Agarwal",
-            "Mehta", "Jain", "Bansal", "Kapoor"
-        ]
+        with transaction.atomic():
+            Doctor.objects.all().delete()
 
-        doctors = []
+            for i in range(1, 51):
+                username = f"doctor{i}"
 
-        doctors.append(
-            Doctor(
-                name="Dr. Narendra Modi",
-                specialization="General Physician",
-                rating=5.0
-            )
-        )
+                user, _ = User.objects.get_or_create(username=username)
+                user.set_password(PASSWORD)
+                user.save()
 
-        for _ in range(49):
-            name = f"Dr. {random.choice(first_names)} {random.choice(last_names)}"
+                profile, _ = UserProfile.objects.get_or_create(user=user)
+                profile.role = UserProfile.DOCTOR
+                profile.save()
 
-            doctors.append(
-                Doctor(
-                    name=name,
-                    specialization=random.choice(specializations),
-                    rating=round(random.uniform(3.5, 5.0), 1)
+                base_name = random.choice(names)
+
+                Doctor.objects.update_or_create(
+                    user=user,
+                    defaults={
+                        "name": f"Dr. {base_name}",
+                        "specialization": random.choice(specializations),
+                        "rating": round(random.uniform(3.5, 5.0), 1),
+                        "is_verified": True
+                    }
                 )
-            )
 
-        Doctor.objects.bulk_create(doctors)
-
-        self.stdout.write(self.style.SUCCESS("50 doctors added successfully 🚀"))
+        self.stdout.write(self.style.SUCCESS("✅ 50 doctors seeded successfully"))
+        self.stdout.write(self.style.WARNING(f"🔑 Password for all: {PASSWORD}"))
