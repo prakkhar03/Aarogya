@@ -144,13 +144,111 @@
   margin-bottom: 0.75rem;
 }
 
-.result-summary p {
+.result-summary .structured-analysis {
   background-color: white;
-  padding: 1.25rem;
-  border-radius: 8px;
+  padding: 1.5rem;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  font-size: 0.95rem;
 }
+
+.analysis-summary-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-dark);
+  margin-bottom: 1.5rem;
+}
+
+.analysis-condition {
+  background-color: #f1f5f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--primary);
+}
+
+.analysis-list {
+  margin-bottom: 1rem;
+}
+
+.analysis-list ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.analysis-list li {
+  margin-bottom: 0.25rem;
+  color: var(--text-dark);
+}
+
+.suggested-doctors {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-top: 1.5rem;
+}
+
+.doctors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.doctor-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+.doctor-card h5 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.doctor-card p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.analysis-badges {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.analysis-badge {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  min-width: 150px;
+}
+
+.analysis-badge .badge-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+}
+
+.analysis-badge .badge-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.analysis-badge.severity-low .badge-value { color: #10b981; }
+.analysis-badge.severity-medium .badge-value { color: #f59e0b; }
+.analysis-badge.severity-high .badge-value { color: #ef4444; }
+.analysis-badge.severity-critical .badge-value { color: #991b1b; }
 
 .result-actions {
   margin-top: auto;

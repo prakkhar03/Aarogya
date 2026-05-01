@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { UploadCloud, FileText, CheckCircle, BrainCircuit, Share2, Clock } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle, BrainCircuit, Share2, Clock, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AgentReasoningPanel from '../components/AgentReasoningPanel';
 import AnimatedDNA from '../components/AnimatedDNA';
@@ -16,7 +16,7 @@ const PatientDashboard = () => {
   const [result, setResult] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [history, setHistory] = useState([]);
-  const [sharing, setSharing] = useState(false);
+  const [sharing, setSharing] = useState(null);
 
   React.useEffect(() => {
     fetchHistory();
@@ -37,6 +37,27 @@ const PatientDashboard = () => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
+  };
+
+  const handleDownloadReport = () => {
+    if (!result || !result.analysis) return;
+    
+    let analysisObj = result.analysis;
+    if (typeof analysisObj === 'string') {
+      try { analysisObj = JSON.parse(analysisObj); } catch(e) {}
+    }
+
+    const triage = analysisObj?.triage || analysisObj?.analysis || {};
+    
+    const content = `AAROGYA AI CLINICAL REPORT\nReport ID: #${result.report_id || 'N/A'}\nDate: ${new Date().toLocaleDateString()}\n\nSUMMARY\n--------------------------------------------------\n${triage.summary || analysisObj?.summary || "No summary available."}\n\nASSESSMENT\n--------------------------------------------------\nSeverity Level: ${triage.severity || "Unknown"}\nRecommended Specialist: ${triage.doctor_type || "General Physician"}\n\nThis report was generated autonomously by Aarogya AI.\nPlease consult a certified medical professional for official diagnosis.`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Aarogya_Report_${result.report_id || 'Latest'}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleUpload = async () => {
@@ -133,29 +154,140 @@ const PatientDashboard = () => {
                 
                 <div className="result-summary">
                   <h4>Clinical Summary</h4>
-                  <p>{result.analysis?.summary || JSON.stringify(result.analysis)}</p>
+                  <div className="structured-analysis">
+                    {(() => {
+                      let analysisObj = result.analysis;
+                      if (typeof analysisObj === 'string') {
+                        try { analysisObj = JSON.parse(analysisObj); } catch(e) { }
+                      }
+                      
+                      const triage = analysisObj?.triage || analysisObj?.analysis || analysisObj;
+                      
+                      return (
+                        <>
+                          <div className="analysis-summary-text">
+                            <strong>Summary:</strong> {triage?.summary || "Analysis successfully generated. No detailed summary available."}
+                          </div>
+
+                          {triage?.condition && triage.condition !== "Unknown" && (
+                            <div className="analysis-condition">
+                              <strong>Possible Condition:</strong> {triage.condition}
+                            </div>
+                          )}
+
+                          {triage?.precautions && triage.precautions.length > 0 && (
+                            <div className="analysis-list">
+                              <strong>Precautions:</strong>
+                              <ul>
+                                {triage.precautions.map((p, i) => <li key={i}>{p}</li>)}
+                              </ul>
+                            </div>
+                          )}
+
+                          {triage?.key_advice && triage.key_advice.length > 0 && (
+                            <div className="analysis-list">
+                              <strong>Key Advice:</strong>
+                              <ul>
+                                {triage.key_advice.map((a, i) => <li key={i}>{a}</li>)}
+                              </ul>
+                            </div>
+                          )}
+
+                          {triage?.recommendations && triage.recommendations.length > 0 && (
+                            <div className="analysis-list">
+                              <strong>Recommendations:</strong>
+                              <ul>
+                                {triage.recommendations.map((r, i) => <li key={i}>{r}</li>)}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {(triage?.severity || triage?.doctor_type) && (
+                            <div className="analysis-badges">
+                              {triage.severity && (
+                                <div className={`analysis-badge severity-${triage.severity.toLowerCase()}`}>
+                                  <span className="badge-label">Severity</span>
+                                  <span className="badge-value">{triage.severity}</span>
+                                </div>
+                              )}
+                              {triage.doctor_type && (
+                                <div className="analysis-badge doctor-type">
+                                  <span className="badge-label">Recommended Specialist</span>
+                                  <span className="badge-value">{triage.doctor_type}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
 
-                <div className="result-actions">
+                {/* Suggested Doctors Section */}
+                {(() => {
+                  let analysisObj = result.analysis;
+                  if (typeof analysisObj === 'string') {
+                    try { analysisObj = JSON.parse(analysisObj); } catch(e) { }
+                  }
+                  
+                  const doctors = analysisObj?.doctors || [];
+                  
+                  if (doctors.length > 0) {
+                    return (
+                      <div className="suggested-doctors">
+                        <h4>Suggested Specialists for Verification</h4>
+                        <div className="doctors-list">
+                          {doctors.map(doc => (
+                            <div key={doc.id} className="doctor-card glass-card">
+                              <div>
+                                <h5>{doc.name}</h5>
+                                <p>{doc.specialization}</p>
+                              </div>
+                              <button 
+                                className="btn-primary"
+                                disabled={sharing === doc.id}
+                                onClick={async () => {
+                                  setSharing(doc.id);
+                                  try {
+                                    // 1. Create Appointment (PreBook)
+                                    const prebookRes = await axios.post(`${API_BASE_URL}/bookings/prebook/`, {
+                                      doctor_id: doc.id,
+                                      report_id: result.report_id
+                                    }, { headers: { Authorization: `Bearer ${token}` } });
+                                    
+                                    const appointmentId = prebookRes.data.appointment_id;
+
+                                    // 2. Share with Doctor (Verification)
+                                    const shareRes = await axios.post(`${API_BASE_URL}/agents/share/${appointmentId}/`, {}, {
+                                      headers: { Authorization: `Bearer ${token}` }
+                                    });
+                                    
+                                    toast.success(`Sent to Dr. ${doc.name} successfully!`);
+                                  } catch (err) {
+                                    toast.error("Failed to send to doctor.");
+                                  } finally {
+                                    setSharing(null);
+                                  }
+                                }}
+                              >
+                                {sharing === doc.id ? "Sending..." : "Send to Doctor"}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
+                <div className="result-actions" style={{ display: 'flex', gap: '1rem' }}>
                   <button 
-                    className="btn-primary w-100" 
-                    onClick={async () => {
-                      setSharing(true);
-                      try {
-                        // Using a dummy appointment ID 1 for now
-                        const res = await axios.post(`${API_BASE_URL}/share/1/`, {}, {
-                          headers: { Authorization: `Bearer ${token}` }
-                        });
-                        toast.success(`Verification sent to Doctor! (Token: ${res.data.token})`);
-                      } catch (err) {
-                        toast.error("Failed to send to doctor. Ensure an appointment exists.");
-                      } finally {
-                        setSharing(false);
-                      }
-                    }}
-                    disabled={sharing}
+                    className="btn-outline w-100" 
+                    onClick={handleDownloadReport}
                   >
-                    {sharing ? "Sending..." : <><Share2 size={18}/> Send to Doctor for Verification</>}
+                    <Download size={18}/> Download Report
                   </button>
                 </div>
               </div>

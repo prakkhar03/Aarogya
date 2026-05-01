@@ -14,7 +14,11 @@ Analyze the report and return ONLY JSON:
 {{
   "summary": "",
   "severity": "",
-  "doctor_type": ""
+  "doctor_type": "",
+  "condition": "",
+  "precautions": [""],
+  "key_advice": [""],
+  "recommendations": [""]
 }}
 
 Report:
@@ -41,7 +45,11 @@ Report:
         return {
             "summary": "Could not analyze report",
             "severity": "unknown",
-            "doctor_type": "General Physician"
+            "doctor_type": "General Physician",
+            "condition": "Unknown",
+            "precautions": [],
+            "key_advice": [],
+            "recommendations": []
         }
 
 from groq import Groq

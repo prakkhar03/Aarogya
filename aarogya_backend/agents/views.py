@@ -44,3 +44,29 @@ class VerifyView(APIView):
         appointment.save()
 
         return Response({"status": appointment.status})
+
+
+class PendingVerificationsView(APIView):
+    permission_classes = [IsDoctor]
+
+    def get(self, request):
+        verifications = DoctorVerification.objects.filter(
+            appointment__doctor__user=request.user,
+            status="pending"
+        ).select_related('report', 'appointment', 'appointment__user')
+        
+        data = []
+        for v in verifications:
+            data.append({
+                "token": str(v.token),
+                "status": v.status,
+                "appointment_id": v.appointment.id,
+                "patient_name": v.appointment.user.username,
+                "report_id": v.report.id,
+                "report_file": v.report.file.url if v.report.file else None,
+                "report_text": v.report.extracted_text,
+                "report_analysis": v.report.ai_analysis,
+                "created_at": v.appointment.created_at
+            })
+            
+        return Response(data)
