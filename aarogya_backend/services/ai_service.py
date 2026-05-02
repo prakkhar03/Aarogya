@@ -1,25 +1,16 @@
 from groq import Groq
 import os
 import json
+from services.prompt_service import get_prompt
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+
 def call_ai(text):
+    base_prompt = get_prompt("medical_prompt")
 
     prompt = f"""
-You are a medical AI.
-
-Analyze the report and return ONLY JSON:
-
-{{
-  "summary": "",
-  "severity": "",
-  "doctor_type": "",
-  "condition": "",
-  "precautions": [""],
-  "key_advice": [""],
-  "recommendations": [""]
-}}
+{base_prompt}
 
 Report:
 {text[:2000]}
@@ -27,10 +18,8 @@ Report:
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",   # ✅ CURRENT MODEL
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}]
         )
 
         output = response.choices[0].message.content
@@ -52,36 +41,18 @@ Report:
             "recommendations": []
         }
 
-from groq import Groq
-import os
-
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 
 def chat_ai(message, history, extra_context=""):
+    base_prompt = get_prompt("chat_prompt")
 
-    system_prompt = f"""
-You are a helpful medical assistant.
-
-Rules:
-- Use past reports if useful
-- Ask follow-up questions
-- Suggest possible condition
-- Suggest doctor type
-- Do NOT give final diagnosis
-
-Past Report Context:
-{extra_context}
-"""
+    system_prompt = base_prompt.replace("{extra_context}", extra_context)
 
     messages = [{"role": "system", "content": system_prompt}]
 
-    # Add history
     for h in history:
         messages.append({"role": "user", "content": h["user"]})
         messages.append({"role": "assistant", "content": h["bot"]})
 
-    # Current message
     messages.append({"role": "user", "content": message})
 
     try:
