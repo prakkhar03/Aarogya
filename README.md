@@ -9,27 +9,35 @@
 
 ---
 
+## Demo Links
+
+- [![Demo Video](https://img.shields.io/badge/Demo_Video-Drive-0B57D0?style=for-the-badge&logo=google-drive&logoColor=white)](https://drive.google.com/drive/folders/1CwAp2Ky6dLsfaTdDR2QWiAd9r6wD_Pbr?usp=sharing) Demo video walkthrough of the full flow and key features.
+- [![PPT](https://img.shields.io/badge/PPT-Canva-00C4CC?style=for-the-badge&logo=canva&logoColor=white)](https://canva.link/8m60eyqbkw5trbs) Pitch deck covering problem, solution, and architecture.
+- [![Doc](https://img.shields.io/badge/Doc-Drive-0B57D0?style=for-the-badge&logo=google-drive&logoColor=white)](https://drive.google.com/drive/folders/1pJyYgZKQgmZGB7nt7b5yEcl66tcl7wur?usp=sharing) Project doc with detailed notes and references.
+- [![Figma](https://img.shields.io/badge/Figma-Design-1ABCFE?style=for-the-badge&logo=figma&logoColor=white)](https://www.figma.com/design/1MNaNv0p1Cbxa4MBTpRpKH/Untitled?node-id=0-1&t=EQwTcu1UMYj8lXBO-1) Figma file with UI/UX screens and wireframes.
+
 ## 📌 Table of Contents
 
-1. [One-Line Pitch](#one-line-pitch)
-2. [Problem Statement](#problem-statement)
-3. [Solution Overview](#solution-overview)
-4. [Core USP](#core-usp)
-5. [Feature Set](#feature-set)
-6. [System Architecture](#system-architecture)
-7. [Agent Specifications](#agent-specifications)
-8. [Tech Stack](#tech-stack)
-9. [Data Flow](#data-flow)
-10. [Project Structure](#project-structure)
-11. [Setup & Installation](#setup--installation)
-12. [Environment Variables](#environment-variables)
-13. [Running the Project](#running-the-project)
-14. [Prompt Configuration](#prompt-configuration)
-15. [API Documentation](#api-documentation)
-16. [Testing](#testing)
-17. [Deployment](#deployment)
-18. [Future Additions](#future-additions)
-19. [Team](#team)
+1. [ ]  [Demo Links](#demo-links)
+2. [ ]  [One-Line Pitch](#one-line-pitch)
+3. [ ]  [Problem Statement](#problem-statement)
+4. [ ]  [Solution Overview](#solution-overview)
+5. [ ]  [Core USP](#core-usp)
+6. [ ]  [Feature Set](#feature-set)
+7. [ ]  [System Architecture](#system-architecture)
+8. [ ]  [Agent Specifications](#agent-specifications)
+9. [ ]  [Tech Stack](#tech-stack)
+10. [ ]  [Data Flow](#data-flow)
+11. [ ]  [Project Structure](#project-structure)
+12. [ ]  [Setup & Installation](#setup--installation)
+13. [ ]  [Environment Variables](#environment-variables)
+14. [ ]  [Running the Project](#running-the-project)
+15. [ ]  [Prompt Configuration](#prompt-configuration)
+16. [ ]  [API Documentation](#api-documentation)
+17. [ ]  [Testing](#testing)
+18. [ ]  [Deployment](#deployment)
+19. [ ]  [Future Additions](#future-additions)
+20. [ ]  [Team](#team)
 
 ---
 
@@ -45,11 +53,12 @@ Indian patients today juggle paper prescriptions, lab reports, and follow-up boo
 
 Three core failure modes this project solves:
 
-| Failure | Description |
-|---|---|
-| **Missed signals** | Drug interactions and chronic patterns go undetected because no system sees all the data |
-| **Administrative burden** | Clinicians spend ~30% of their time on coordination that requires no medical judgment |
-| **Patient helplessness** | Patients lack tools to understand complex reports or navigate specialist referrals |
+
+| Failure                   | Description                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| **Missed signals**        | Drug interactions and chronic patterns go undetected because no system sees all the data |
+| **Administrative burden** | Clinicians spend ~30% of their time on coordination that requires no medical judgment    |
+| **Patient helplessness**  | Patients lack tools to understand complex reports or navigate specialist referrals       |
 
 ---
 
@@ -57,31 +66,7 @@ Three core failure modes this project solves:
 
 Aarogya AI is a **multi-agent orchestration system** that accepts any medical input, routes it to the right specialist AI agent, synthesises the findings, and takes real-world action - all within a single pipeline under 30 seconds.
 
-```
-Patient Input (report / symptoms / voice)
-        │
-        ▼
-┌──────────────────────────────┐
-│       Orchestrator Agent     │  ← LangGraph state machine
-│  classify → dispatch → merge │
-└──────────────┬───────────────┘
-               │  parallel dispatch
-    ┌──────────┼──────────┬──────────────┐
-    ▼          ▼          ▼              ▼
-Report      Triage     Booking      Doctor
-Analysis    Agent      Agent        Verification
-Agent                               Portal
-    │          │          │              │
-    └──────────┴──────────┴──────────────┘
-                          │
-                          ▼
-              Human-in-Loop Gate
-              (confirm before action)
-                          │
-                          ▼
-                  Real-World Action
-           (appointment booked / alert sent)
-```
+![Solution Overview Diagram](aarogya_frontend/src/assets/Solution%20Overview.jpeg)
 
 ---
 
@@ -124,7 +109,9 @@ This creates a **trust layer** that pure-AI systems cannot offer and purely huma
 ### ✅ Core Features (Hackathon Scope)
 
 #### Feature 1 - Medical Report Analysis Agent
+
 The flagship feature. User uploads any medical test report (blood work, imaging, pathology PDF). The Report Analysis Agent:
+
 - Extracts text via OCR (Tesseract / Google Vision)
 - Maps every value against clinical reference ranges from PubMed and MedlinePlus RAG corpus
 - Generates a **structured, doctor-style narrative** in plain language with citations
@@ -132,28 +119,36 @@ The flagship feature. User uploads any medical test report (blood work, imaging,
 - Produces a shareable verification card for doctor review
 
 #### Feature 2 - Symptom Interpretation Agent (Triage)
+
 User describes symptoms in text or Hindi voice. The Triage Agent:
+
 - Classifies severity on an ESI-like **5-level scale**
 - Identifies likely diagnostic categories
 - Recommends **specific, bookable specialist doctors** matched to the symptom profile
 - Feeds recommendations directly into the Booking Agent with pre-filled context
 
 #### Feature 3 - Appointment Booking Agent
+
 After symptom analysis or report review, the Booking Agent:
+
 - Presents matched doctors with available slots
-- Places a **real outbound Twilio Voice call** to book the appointment
+- Places a **real outbound voice call** to book the appointment
 - Sends the booked doctor the AI-generated report analysis for pre-consultation review
 - Completes the closed feedback loop
 
 #### Feature 4 - Doctor Verification Portal ⭐ (USP)
+
 A lightweight portal for the appointed doctor:
+
 - Receives a secure shareable link with the AI-generated analysis + original report
 - Can annotate, approve, or flag specific sections
 - Verified output stored in patient record and visible on the patient dashboard
 - Directly addresses the clinical safety concern of AI-only systems
 
 #### Feature 5 - Agent Reasoning Panel
+
 Real-time UI panel that streams:
+
 - Which agents are currently running
 - Tool calls made by each agent
 - Intermediate conclusions and confidence levels
@@ -161,7 +156,9 @@ Real-time UI panel that streams:
 - Override controls before any action executes
 
 #### Feature 6 - Prompt Configuration Panel
+
 Admin panel exposing all agent system prompts:
+
 - Stored in `config/prompts.yaml`
 - Editable via UI without touching source code
 - Changes reflected immediately on next agent run
@@ -173,14 +170,15 @@ Admin panel exposing all agent system prompts:
 
 These features are fully designed and documented but deferred from the hackathon build to ensure core features are delivered with depth:
 
-| Feature | Description |
-|---|---|
-| **Prescription Decoding Agent** | OCR prescription upload, RxNorm drug lookup, interaction check against patient history, patient-friendly medication guide |
+
+| Feature                              | Description                                                                                                                            |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Prescription Decoding Agent**      | OCR prescription upload, RxNorm drug lookup, interaction check against patient history, patient-friendly medication guide              |
 | **Insurance Claim Navigation Agent** | Rejected claim upload, IRDAI guidelines RAG, appeal grounds identification, evidence-backed appeal letter with policy clause citations |
-| **Longitudinal Health Timeline** | HistoryAgent queries past records, visualises 5-year risk trajectory for chronic conditions |
-| **WhatsApp Medication Reminders** | GuardianAgent schedules reminders via WhatsApp Business API in patient's preferred language |
-| **On-Device Inference Mode** | Ollama-powered fallback for privacy-sensitive operations, keeping PHI off cloud servers |
-| **Wearable Integration** | Google Fit / Apple Health feed for vitals-aware triage |
+| **Longitudinal Health Timeline**     | HistoryAgent queries past records, visualises 5-year risk trajectory for chronic conditions                                            |
+| **WhatsApp Medication Reminders**    | GuardianAgent schedules reminders via WhatsApp Business API in patient's preferred language                                            |
+| **On-Device Inference Mode**         | Ollama-powered fallback for privacy-sensitive operations, keeping PHI off cloud servers                                                |
+| **Wearable Integration**             | Google Fit / Apple Health feed for vitals-aware triage                                                                                 |
 
 ---
 
@@ -188,76 +186,11 @@ These features are fully designed and documented but deferred from the hackathon
 
 ### High-Level Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         FRONTEND                                │
-│              React + Vite + Tailwind + shadcn/ui                │
-│   ┌──────────┐  ┌───────────────┐  ┌──────────────────────┐    │
-│   │  Upload  │  │    Action     │  │   Agent Reasoning    │    │
-│   │   View   │  │   Dashboard   │  │       Panel (SSE)    │    │
-│   └──────────┘  └───────────────┘  └──────────────────────┘    │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ REST / WebSocket / SSE
-┌─────────────────────────▼───────────────────────────────────────┐
-│                    API GATEWAY (Express.js / Node)               │
-│         Auth (JWT) │ File Uploads │ SSE Bridge │ Twilio Webhooks │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │ Internal REST
-┌─────────────────────────▼───────────────────────────────────────┐
-│               ORCHESTRATION LAYER (Python / FastAPI)            │
-│                                                                 │
-│   ┌──────────────────────────────────────────────────────────┐  │
-│   │              LangGraph Orchestrator                      │  │
-│   │  input_ingest → classify → dispatch → parallel_agents   │  │
-│   │  → blackboard_merge → contradiction_resolver            │  │
-│   │  → action_planner → human_in_loop_gate → executor       │  │
-│   └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│   ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │
-│   │  Report  │ │  Triage  │ │ Booking  │ │  Doctor Verify   │  │
-│   │  Agent   │ │  Agent   │ │  Agent   │ │     Module       │  │
-│   └──────────┘ └──────────┘ └──────────┘ └──────────────────┘  │
-└──────┬───────────────┬──────────────────────────────────────────┘
-       │               │
-┌──────▼──────┐  ┌──────▼────────────────────────────────────────┐
-│   Neo4j     │  │              External Services                 │
-│  (Patient   │  │  Pinecone │ Postgres │ Redis │ Twilio │ RxNorm │
-│   Graph)    │  │  PubMed RAG │ ICD-10 │ Bhashini │ FHIR       │
-└─────────────┘  └───────────────────────────────────────────────┘
-```
+![High-Level Architecture Diagram](aarogya_frontend/src/assets/High-Level%20Diagram.jpeg)
 
 ### LangGraph State Machine Nodes
 
-```
-input_ingest
-    │
-    ▼
-classify_intent          ← determines: report | symptom | booking | claim
-    │
-    ▼
-dispatch_to_orchestrator
-    │
-    ▼
-parallel_agent_execution ← all relevant agents fire simultaneously
-    │
-    ▼
-blackboard_merge         ← agents publish findings to Redis blackboard
-    │
-    ▼
-contradiction_resolver   ← orchestrator resolves conflicting agent outputs
-    │
-    ▼
-action_planner           ← constructs prioritised action list
-    │
-    ▼
-human_in_loop_gate       ← REQUIRED for any real-world action
-    │
-    ▼
-executor                 ← fires confirmed actions (Twilio, booking, alerts)
-    │
-    ▼
-response_synthesiser     ← builds final patient-facing output
-```
+![LangGraph State Machine Nodes Diagram](aarogya_frontend/src/assets/LangGraph%20State%20Machine%20Nodes.jpeg)
 
 ---
 
@@ -267,82 +200,87 @@ response_synthesiser     ← builds final patient-facing output
 
 ### 🧠 Orchestrator Agent
 
-| Property | Detail |
-|---|---|
-| **Role** | Central coordinator. Classifies intent, dispatches tasks, merges findings, resolves contradictions, synthesises final response |
-| **Model** | Claude Sonnet (complex reasoning) |
-| **Inputs** | Raw user input, patient ID, session context |
-| **Outputs** | Dispatch instructions, synthesised action plan, FHIR-formatted summary |
-| **Tools** | LangGraph state machine, intent classifier, Redis blackboard read/write |
+
+| Property    | Detail                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **Role**    | Central coordinator. Classifies intent, dispatches tasks, merges findings, resolves contradictions, synthesises final response |
+| **Model**   | Claude Sonnet (complex reasoning)                                                                                              |
+| **Inputs**  | Raw user input, patient ID, session context                                                                                    |
+| **Outputs** | Dispatch instructions, synthesised action plan, FHIR-formatted summary                                                         |
+| **Tools**   | LangGraph state machine, intent classifier, Redis blackboard read/write                                                        |
 
 ### 🔬 Report Analysis Agent
 
-| Property | Detail |
-|---|---|
-| **Role** | Processes medical test reports. Generates structured doctor-style narrative with flagged values and action plan |
-| **Model** | Claude Sonnet |
-| **Inputs** | Lab PDF / image (OCR-extracted text), patient history from Neo4j |
-| **Outputs** | Structured findings card, flagged abnormalities with severity, doctor-verification share link |
-| **Tools** | PDF/OCR extraction, PubMed RAG (Pinecone), MedlinePlus API, ICD-10 lookup, Neo4j patient graph read |
-| **Prompt File** | `config/prompts.yaml` → `report_analysis_agent` |
+
+| Property        | Detail                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Role**        | Processes medical test reports. Generates structured doctor-style narrative with flagged values and action plan |
+| **Model**       | Claude Sonnet                                                                                                   |
+| **Inputs**      | Lab PDF / image (OCR-extracted text), patient history from Neo4j                                                |
+| **Outputs**     | Structured findings card, flagged abnormalities with severity, doctor-verification share link                   |
+| **Tools**       | PDF/OCR extraction, PubMed RAG (Pinecone), MedlinePlus API, ICD-10 lookup, Neo4j patient graph read             |
+| **Prompt File** | `config/prompts.yaml` → `report_analysis_agent`                                                                |
 
 ### 🚨 Triage Agent (Symptom Interpretation)
 
-| Property | Detail |
-|---|---|
-| **Role** | Classifies symptom severity, identifies diagnostic categories, recommends specialist doctors |
-| **Model** | Llama 3.1 8B via Groq (speed-optimised) |
-| **Inputs** | Natural language / Hindi symptom description, patient age and history |
-| **Outputs** | ESI-level triage score (1–5), diagnostic category, recommended doctor list with availability |
-| **Tools** | Symptom-to-diagnosis RAG, doctor availability API, severity classification |
-| **Prompt File** | `config/prompts.yaml` → `triage_agent` |
+
+| Property        | Detail                                                                                        |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| **Role**        | Classifies symptom severity, identifies diagnostic categories, recommends specialist doctors  |
+| **Model**       | Llama 3.1 8B via Groq (speed-optimised)                                                       |
+| **Inputs**      | Natural language / Hindi symptom description, patient age and history                         |
+| **Outputs**     | ESI-level triage score (1–5), diagnostic category, recommended doctor list with availability |
+| **Tools**       | Symptom-to-diagnosis RAG, doctor availability API, severity classification                    |
+| **Prompt File** | `config/prompts.yaml` → `triage_agent`                                                       |
 
 ### 📅 Booking Agent
 
-| Property | Detail |
-|---|---|
-| **Role** | Books appointments with recommended doctors. Passes AI analysis to doctor pre-consultation |
-| **Model** | Llama 3.1 8B via Groq |
-| **Inputs** | Doctor selection, available slots, patient context, AI report analysis output |
-| **Outputs** | Confirmed appointment, doctor-facing pre-consultation summary, booking confirmation |
-| **Tools** | Twilio Voice API, web booking integration, WhatsApp notification |
-| **Prompt File** | `config/prompts.yaml` → `booking_agent` |
+
+| Property        | Detail                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| **Role**        | Books appointments with recommended doctors. Passes AI analysis to doctor pre-consultation |
+| **Model**       | Llama 3.1 8B via Groq                                                                      |
+| **Inputs**      | Doctor selection, available slots, patient context, AI report analysis output              |
+| **Outputs**     | Confirmed appointment, doctor-facing pre-consultation summary, booking confirmation        |
+| **Tools**       | Voice calling provider, web booking integration, WhatsApp notification                     |
+| **Prompt File** | `config/prompts.yaml` → `booking_agent`                                                   |
 
 ### 👨‍⚕️ Doctor Verification Module
 
-| Property | Detail |
-|---|---|
-| **Role** | Provides the appointed doctor a view to review, annotate, and verify AI-generated analyses |
-| **Model** | N/A (rule-based module with secure link generation) |
-| **Inputs** | Shareable report analysis link, doctor authentication token |
+
+| Property    | Detail                                                                                       |
+| ----------- | -------------------------------------------------------------------------------------------- |
+| **Role**    | Provides the appointed doctor a view to review, annotate, and verify AI-generated analyses   |
+| **Model**   | N/A (rule-based module with secure link generation)                                          |
+| **Inputs**  | Shareable report analysis link, doctor authentication token                                  |
 | **Outputs** | Annotated analysis with doctor sign-off, flagged sections, verified status in patient record |
-| **Tools** | Secure share-link generator, annotation storage (Postgres), Neo4j patient graph write |
+| **Tools**   | Secure share-link generator, annotation storage (Postgres), Neo4j patient graph write        |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Frontend** | React + Vite + Tailwind CSS + shadcn/ui | UI, component system |
-| **Charts** | Recharts | Health timeline visualisation |
-| **Animations** | Framer Motion | Agent collaboration visualisation |
-| **Real-time** | SSE (Server-Sent Events) | Live agent reasoning stream |
-| **API Gateway** | Express.js / Node.js | Auth, file uploads, WebSocket/SSE bridge |
-| **Orchestration** | Python FastAPI + LangGraph | Agent state machine, RAG retrieval |
-| **Agent Framework** | CrewAI (collaboration patterns) | Agent-to-agent coordination |
-| **Patient Graph** | Neo4j | Longitudinal patient data, Cypher queries |
-| **Vector DB** | Pinecone | Medical RAG (PubMed, MedlinePlus, ICD-10) |
-| **Relational DB** | PostgreSQL | Users, audit logs, doctor verification records |
-| **Cache / Blackboard** | Redis | Agent intermediate findings, SSE pub-sub |
-| **LLM (complex)** | Claude Sonnet | Orchestrator, Report Analysis Agent |
-| **LLM (fast)** | Llama 3.1 8B via Groq | Triage Agent, Booking Agent |
-| **OCR** | Tesseract + Google Vision API | PDF and handwritten document extraction |
-| **Voice** | Twilio Voice API | Real outbound appointment booking calls |
-| **Translation** | Sarvam AI / Bhashini | Hindi input and output |
-| **Voice Transcription** | OpenAI Whisper | Hindi voice-to-text |
-| **Health Standards** | HAPI FHIR test server | Clinician-compatible structured output |
-| **Containerisation** | Docker + Docker Compose | One-command local setup |
+
+| Layer                   | Technology                              | Purpose                                        |
+| ----------------------- | --------------------------------------- | ---------------------------------------------- |
+| **Frontend**            | React + Vite + Tailwind CSS + shadcn/ui | UI, component system                           |
+| **Charts**              | Recharts                                | Health timeline visualisation                  |
+| **Animations**          | Framer Motion                           | Agent collaboration visualisation              |
+| **Real-time**           | SSE (Server-Sent Events)                | Live agent reasoning stream                    |
+| **API Gateway**         | Express.js / Node.js                    | Auth, file uploads, WebSocket/SSE bridge       |
+| **Orchestration**       | Python FastAPI + LangGraph              | Agent state machine, RAG retrieval             |
+| **Agent Framework**     | CrewAI (collaboration patterns)         | Agent-to-agent coordination                    |
+| **Patient Graph**       | Neo4j                                   | Longitudinal patient data, Cypher queries      |
+| **Vector DB**           | Pinecone                                | Medical RAG (PubMed, MedlinePlus, ICD-10)      |
+| **Relational DB**       | PostgreSQL                              | Users, audit logs, doctor verification records |
+| **Cache / Blackboard**  | Redis                                   | Agent intermediate findings, SSE pub-sub       |
+| **LLM (complex)**       | Claude Sonnet                           | Orchestrator, Report Analysis Agent            |
+| **LLM (fast)**          | Llama 3.1 8B via Groq                   | Triage Agent, Booking Agent                    |
+| **OCR**                 | Tesseract + Google Vision API           | PDF and handwritten document extraction        |
+| **Voice**               | Voice calling provider                  | Real outbound appointment booking calls        |
+| **Translation**         | Sarvam AI / Bhashini                    | Hindi input and output                         |
+| **Voice Transcription** | OpenAI Whisper                          | Hindi voice-to-text                            |
+| **Health Standards**    | HAPI FHIR test server                   | Clinician-compatible structured output         |
 
 ### RAG Corpus Sources
 
@@ -417,7 +355,7 @@ Pinecone Index: aarogya-medical-rag
 6. human_in_loop_gate → Patient confirms booking
         │
 7. Booking Agent fires:
-   ├── Twilio Voice outbound call to doctor's clinic
+        ├── Voice call to doctor's clinic
    └── Sends pre-consultation AI summary to Doctor Verification Portal
         │
 8. Booking confirmation → patient dashboard + WhatsApp notification
@@ -453,7 +391,7 @@ aarogya-ai/
 │   │   ├── auth.js                    # JWT auth routes
 │   │   ├── upload.js                  # File upload (multer)
 │   │   ├── sse.js                     # SSE bridge to React frontend
-│   │   └── webhooks.js                # Twilio + WhatsApp webhooks
+│   │   └── webhooks.js                # WhatsApp webhooks
 │   ├── middleware/
 │   │   ├── authMiddleware.js
 │   │   └── validateInput.js           # Input sanitisation
@@ -480,7 +418,7 @@ aarogya-ai/
 │   │   ├── ocr_tool.py                # Tesseract + Google Vision OCR
 │   │   ├── rxnorm_tool.py             # RxNorm API wrapper
 │   │   ├── icd10_tool.py              # ICD-10 API wrapper
-│   │   └── twilio_tool.py             # Twilio Voice call wrapper
+│   │   └── voice_call_tool.py         # Voice call provider wrapper
 │   ├── db/
 │   │   ├── neo4j_client.py            # Neo4j connection + Cypher helpers
 │   │   └── postgres_client.py         # Postgres connection + ORM models
@@ -498,7 +436,6 @@ aarogya-ai/
 │   ├── api_collection.json            # Postman collection
 │   └── figma_wireframes.pdf           # UI wireframes
 │
-├── docker-compose.yml                 # One-command full stack setup
 ├── .env.example                       # All required environment variables
 └── README.md                          # This file
 ```
@@ -513,43 +450,18 @@ aarogya-ai/
 # Required
 Node.js >= 18.x
 Python >= 3.11
-Docker + Docker Compose (recommended)
 
 # Accounts / API Keys needed
 - Anthropic API key (Claude Sonnet)
 - Groq API key (Llama 3.1 8B)
-- Twilio account (Voice + WhatsApp)
+- Voice calling provider account
 - Pinecone account
 - Neo4j Aura (free tier works)
 - Google Cloud (Vision API for OCR)
 - Sarvam AI / Bhashini (Hindi translation)
 ```
 
-### Option A - Docker (Recommended)
-
-```bash
-# 1. Clone the repo
-git clone https://github.com/your-team/aarogya-ai.git
-cd aarogya-ai
-
-# 2. Copy and fill environment variables
-cp .env.example .env
-# Edit .env with your API keys (see Environment Variables section)
-
-# 3. Seed the Pinecone RAG corpus (one-time setup, ~5 mins)
-docker compose run --rm orchestration python rag/seed_corpus.py
-
-# 4. Start all services
-docker compose up
-
-# 5. Open the app
-# Frontend:      http://localhost:5173
-# API Gateway:   http://localhost:3000
-# Orchestration: http://localhost:8000
-# API Docs:      http://localhost:8000/docs
-```
-
-### Option B - Manual Setup
+### Manual Setup
 
 ```bash
 # ── Frontend ──────────────────────────────────
@@ -572,13 +484,6 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 # Runs at http://localhost:8000
 
-# ── Neo4j (local) ─────────────────────────────
-# Or use Neo4j Aura free tier - paste connection URI in .env
-docker run -p 7474:7474 -p 7687:7687 \
-  -e NEO4J_AUTH=neo4j/yourpassword neo4j:latest
-
-# ── Redis ─────────────────────────────────────
-docker run -p 6379:6379 redis:alpine
 ```
 
 ---
@@ -609,9 +514,6 @@ POSTGRES_URI=postgresql://user:password@localhost:5432/aarogya
 REDIS_URL=redis://localhost:6379
 
 # ── Communication ─────────────────────────────────────────────────
-TWILIO_ACCOUNT_SID=AC...
-TWILIO_AUTH_TOKEN=...
-TWILIO_PHONE_NUMBER=+1...
 WHATSAPP_BUSINESS_NUMBER=whatsapp:+91...
 
 # ── OCR ───────────────────────────────────────────────────────────
@@ -659,7 +561,7 @@ python rag/seed_corpus.py
 8. Return to patient view - see "Verified by Dr. Demo" status
 9. Click "Book Appointment" on a recommended doctor
 10. Confirm in the Human-in-Loop gate
-11. Watch Twilio call fire (teammate's phone rings)
+11. Watch the voice call fire (teammate's phone rings)
 12. Open Prompt Config panel → edit Triage Agent prompt → re-run
 ```
 
@@ -725,14 +627,14 @@ triage_agent: |
   - For Level 1–2, always recommend emergency services FIRST before any booking.
 
 booking_agent: |
-  You are an appointment booking specialist. Your job is to confirm doctor selection
-  and coordinate the booking via Twilio Voice or web booking.
+        You are an appointment booking specialist. Your job is to confirm doctor selection
+        and coordinate the booking via voice call or web booking.
   
   RULES:
   - Always confirm the patient's choice before initiating any call or booking.
   - Pass the AI-generated report analysis summary to the doctor's pre-consultation portal.
   - Booking confirmation must include: doctor name, clinic, date, time, and a preparation note.
-  - If Twilio call fails, fall back to web booking silently - do not expose the failure.
+        - If the voice call fails, fall back to web booking silently - do not expose the failure.
 ```
 
 ### Editing Prompts via UI
@@ -812,10 +714,12 @@ npx newman run docs/api_collection.json --env-var "base_url=http://localhost:800
 tests/
 ├── test_report_agent.py       Unit tests for OCR extraction, RAG grounding, output format
 ├── test_triage_agent.py       Unit tests for severity classification, doctor matching
-├── test_booking_agent.py      Unit tests for Twilio integration (mocked)
+├── test_booking_agent.py      Unit tests for voice calling integration (mocked)
 ├── test_orchestrator.py       Integration test - full pipeline with sample PDF
 └── test_doctor_verify.py      Unit tests for share link generation and annotation storage
 ```
+
+![Test Coverage Screenshot](aarogya_frontend/src/assets/test.jpeg)
 
 ### Sample Test Data
 
@@ -832,7 +736,7 @@ docs/sample_data/
 
 ## Deployment
 
-Deployment is not mandatory but earns bonus points. The project is Docker-ready.
+Deployment is not mandatory but earns bonus points.
 
 ### Deploy to Render (Recommended)
 
@@ -852,13 +756,6 @@ Deployment is not mandatory but earns bonus points. The project is Docker-ready.
 4. Seed Pinecone: `python rag/seed_corpus.py` (run once via Render shell)
 5. Live URL added here once deployed: `[LIVE_URL]`
 
-### Docker Compose (Local Full Stack)
-
-```bash
-docker compose up --build
-# All 6 services start: frontend, gateway, orchestration, neo4j, postgres, redis
-```
-
 ---
 
 ## Future Additions
@@ -866,12 +763,14 @@ docker compose up --build
 The following features are designed and documented, ready for the next build sprint:
 
 ### Prescription Decoding Agent
+
 - Upload handwritten or printed prescriptions
 - OCR extraction → RxNorm drug lookup → patient-friendly medication guide
 - Drug interaction check against patient's stored medication history in Neo4j
 - Dangerous interaction alert with severity rating
 
 ### Insurance Claim Navigation Agent
+
 - Upload rejected claim document
 - Claim Agent cross-references rejection reason against IRDAI guidelines (Pinecone RAG)
 - Identifies appeal grounds with policy clause citations
@@ -885,11 +784,12 @@ The following features are designed and documented, ready for the next build spr
 
 ### What This Project Is
 
-Aarogya AI is a **multi-agent healthcare orchestration system**. It is NOT a chatbot. It is NOT a single-model prompt chain. It is a LangGraph state machine that dispatches tasks to multiple specialist LLM agents running in parallel, merges their outputs via a Redis blackboard, and executes real-world actions (Twilio calls, database writes) only after explicit human confirmation.
+Aarogya AI is a **multi-agent healthcare orchestration system**. It is NOT a chatbot. It is NOT a single-model prompt chain. It is a LangGraph state machine that dispatches tasks to multiple specialist LLM agents running in parallel, merges their outputs via a Redis blackboard, and executes real-world actions (voice calls, database writes) only after explicit human confirmation.
 
 ### Critical Architectural Decisions to Respect
 
 **1. All agent prompts live in `config/prompts.yaml` - never hardcode prompts in agent files.**
+
 ```python
 # ✅ CORRECT
 class ReportAgent(BaseAgent):
@@ -902,12 +802,13 @@ class ReportAgent(BaseAgent):
 ```
 
 **2. Every agent inherits from `BaseAgent` in `agents/base_agent.py`.**
+
 ```python
 # Every new agent must follow this pattern
 class NewAgent(BaseAgent):
     def __init__(self):
         super().__init__(prompt_key="new_agent")  # key in prompts.yaml
-    
+  
     async def run(self, input: AgentInput) -> AgentOutput:
         # 1. Call tools
         # 2. Write to blackboard
@@ -915,6 +816,7 @@ class NewAgent(BaseAgent):
 ```
 
 **3. Inter-agent communication happens ONLY via the Redis blackboard - agents do not call each other directly.**
+
 ```python
 # ✅ CORRECT - agent writes to blackboard
 await blackboard.publish(job_id, agent_name="report_agent", findings=result)
@@ -924,12 +826,14 @@ triage_result = await triage_agent.run(report_agent.output)
 ```
 
 **4. The `human_in_loop_gate` node in the LangGraph graph MUST be hit before any of these actions:**
-- Twilio Voice calls
+
+- Voice calls
 - WhatsApp messages
 - Any write to an external system
 - Any action with financial cost
 
 **5. No API keys in source code - ever.**
+
 ```python
 # ✅ CORRECT
 import os
@@ -979,7 +883,7 @@ class DoctorRecommendation(BaseModel):
     clinic: str
     next_available: datetime
     rating: float
-    booking_method: Literal["twilio_call", "web_booking"]
+        booking_method: Literal["voice_call", "web_booking"]
 ```
 
 ### Common Pitfalls to Avoid
@@ -995,12 +899,13 @@ class DoctorRecommendation(BaseModel):
 
 ## Team
 
-| Member | GitHub | Module Ownership |
-|---|---|---|
-| [Name 1] | @handle | Orchestrator + LangGraph state machine |
-| [Name 2] | @handle | Report Analysis Agent + RAG pipeline |
+
+| Member   | GitHub  | Module Ownership                                 |
+| -------- | ------- | ------------------------------------------------ |
+| [Name 1] | @handle | Orchestrator + LangGraph state machine           |
+| [Name 2] | @handle | Report Analysis Agent + RAG pipeline             |
 | [Name 3] | @handle | Frontend + Agent Reasoning Panel + Doctor Portal |
-| [Name 4] | @handle | Triage Agent + Booking Agent + Twilio integration |
+| [Name 4] | @handle | Triage Agent + Booking Agent + Voice integration |
 
 ---
 
