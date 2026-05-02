@@ -9,9 +9,15 @@ class PreBookView(APIView):
     def post(self, request):
         doctor_id = request.data.get("doctor_id")
         report_id = request.data.get("report_id")
+        if not request.user.profile.email:
+            return Response(
+                {"error": "Please add email before booking"},
+                status=400
+            )
 
         if not doctor_id or not report_id:
             return Response({"error": "doctor_id & report_id required"}, status=400)
+
 
         appointment = Appointment.objects.create(
             user=request.user,

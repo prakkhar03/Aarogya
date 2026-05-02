@@ -75,3 +75,18 @@ class MeView(APIView):
             "username": request.user.username,
             "role": role,
         })
+
+
+class UpdateEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        email = request.data.get("email")
+
+        if not email:
+            return Response({"error": "email required"}, status=400)
+
+        request.user.profile.email = email
+        request.user.profile.save()
+
+        return Response({"status": "email saved"})

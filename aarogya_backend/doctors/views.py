@@ -28,13 +28,22 @@ class DoctorProfileView(APIView):
         })
 
 
+
+from services.notification_service import send_approval_email
+
+
 class VerifyView(APIView):
     permission_classes = [IsAuthenticated, IsDoctor]
 
     def post(self, request, token):
         verification = get_object_or_404(DoctorVerification, token=token)
 
+
+        if verification.appointment.doctor.user != request.user:
+            return Response({"error": "Not allowed"}, status=403)
+
         action = request.data.get("action")
+
         if action not in ("approved", "rejected"):
             return Response(
                 {"error": "action must be 'approved' or 'rejected'"},
@@ -48,9 +57,15 @@ class VerifyView(APIView):
         appointment.status = "confirmed" if action == "approved" else "cancelled"
         appointment.save()
 
-        return Response({"status": appointment.status})
+        send_approval_email(
+            appointment.user,
+            appointment.status
+        )
 
-
+        return Response({
+            "status": appointment.status,
+            "message": f"Appointment {appointment.status} and email sent"
+        })
 
 from .models import Doctor
 from utils.permissions import IsDoctor
