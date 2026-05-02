@@ -902,10 +902,9 @@ class DoctorRecommendation(BaseModel):
 
 | Member   | GitHub  | Module Ownership                                 |
 | -------- | ------- | ------------------------------------------------ |
-| [Name 1] | @handle | Orchestrator + LangGraph state machine           |
-| [Name 2] | @handle | Report Analysis Agent + RAG pipeline             |
-| [Name 3] | @handle | Frontend + Agent Reasoning Panel + Doctor Portal |
-| [Name 4] | @handle | Triage Agent + Booking Agent + Voice integration |
+| [Prakhar N] | @prakkhar03   | Orchestrator + LangGraph state machine + RAG pipeline|
+| [Prakhar]   | @prakhar-174  | Frontend + Agent Reasoning Panel + Doctor Portal     |
+| [Kshitiz]   | @kshitiz-2027 | Report Analysis Agent + Triage Agent + Booking Agent |
 
 ---
 
