@@ -7,7 +7,7 @@ import AnimatedDNA from '../components/AnimatedDNA';
 import { useAuth } from '../hooks/useAuth';
 import './PatientDashboard.css';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 const PatientDashboard = () => {
   const { token } = useAuth();
