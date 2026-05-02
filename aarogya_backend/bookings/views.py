@@ -29,5 +29,15 @@ class AppointmentListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        appointments = Appointment.objects.filter(user=request.user)
-        return Response(list(appointments.values()))
+        appointments = Appointment.objects.filter(user=request.user).select_related('doctor')
+        data = []
+        for appt in appointments:
+            data.append({
+                "id": appt.id,
+                "doctor_name": appt.doctor.name,
+                "doctor_specialization": appt.doctor.specialization,
+                "report_id": appt.report_id,
+                "status": appt.status,
+                "created_at": appt.created_at
+            })
+        return Response(data)

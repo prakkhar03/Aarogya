@@ -16,10 +16,14 @@ const PatientDashboard = () => {
   const [result, setResult] = useState(null);
   const [panelOpen, setPanelOpen] = useState(false);
   const [history, setHistory] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [sharing, setSharing] = useState(null);
 
   React.useEffect(() => {
-    fetchHistory();
+    if (token) {
+      fetchHistory();
+      fetchAppointments();
+    }
   }, [token]);
 
   const fetchHistory = async () => {
@@ -30,6 +34,17 @@ const PatientDashboard = () => {
       setHistory(res.data);
     } catch (err) {
       console.error("Failed to fetch reports", err);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/bookings/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAppointments(res.data);
+    } catch (err) {
+      console.error("Failed to fetch appointments", err);
     }
   };
 
@@ -263,15 +278,16 @@ const PatientDashboard = () => {
                                       headers: { Authorization: `Bearer ${token}` }
                                     });
                                     
-                                    toast.success(`Sent to Dr. ${doc.name} successfully!`);
+                                    toast.success(`Appointment requested with Dr. ${doc.name}!`);
+                                    fetchAppointments();
                                   } catch (err) {
-                                    toast.error("Failed to send to doctor.");
+                                    toast.error("Failed to book appointment.");
                                   } finally {
                                     setSharing(null);
                                   }
                                 }}
                               >
-                                {sharing === doc.id ? "Sending..." : "Send to Doctor"}
+                                {sharing === doc.id ? "Booking..." : "Book Appointment"}
                               </button>
                             </div>
                           ))}
@@ -321,6 +337,40 @@ const PatientDashboard = () => {
                   >
                     View Analysis
                   </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Appointments Section */}
+        {appointments.length > 0 && (
+          <div className="history-section mt-5" style={{ paddingBottom: '3rem' }}>
+            <h3>My Appointments</h3>
+            <div className="history-grid mt-3">
+              {appointments.map(appt => (
+                <div key={appt.id} className="history-card glass-card">
+                  <div className="history-card-header">
+                    <Clock size={20} color="var(--primary)" />
+                    <span>Appt #{appt.id}</span>
+                  </div>
+                  <h4 style={{ margin: '0.5rem 0 0.25rem' }}>Dr. {appt.doctor_name}</h4>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-light)', marginBottom: '0.5rem' }}>{appt.doctor_specialization}</p>
+                  
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '999px',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    backgroundColor: appt.status === 'confirmed' ? '#dcfce7' : appt.status === 'rejected' || appt.status === 'cancelled' ? '#fee2e2' : '#fef9c3',
+                    color: appt.status === 'confirmed' ? '#166534' : appt.status === 'rejected' || appt.status === 'cancelled' ? '#991b1b' : '#854d0e',
+                    textTransform: 'capitalize'
+                  }}>
+                    {appt.status}
+                  </div>
+                  <p className="history-date mt-3">Requested: {new Date(appt.created_at).toLocaleDateString()}</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: '0.25rem' }}>For Report #{appt.report_id}</p>
                 </div>
               ))}
             </div>

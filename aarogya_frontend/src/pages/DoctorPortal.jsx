@@ -82,7 +82,7 @@ const DoctorPortal = () => {
       await axios.post(`${API_BASE_URL}/verify/${selectedItem.token}/`, { action }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success(`Report ${action} successfully!`);
+      toast.success(`Appointment ${action} successfully!`);
       setVerificationStatus(prev => ({ ...prev, [selectedItem.token]: action }));
     } catch (err) {
       console.warn("Verification failed", err);
@@ -149,7 +149,7 @@ const DoctorPortal = () => {
         <div className="workspace-panel list-panel">
           <div className="panel-header">
             <List size={20} />
-            <h3>Pending Verifications</h3>
+            <h3>Pending Appointments</h3>
           </div>
           <div className="pending-list">
             {pendingList.map(item => (
@@ -230,25 +230,25 @@ const DoctorPortal = () => {
 
         <div className="workspace-panel action-panel">
           <div className="panel-header">
-            <h3>Clinical Verification</h3>
+            <h3>Appointment Request</h3>
           </div>
           <div className="action-content">
             <p className="instruction-text">
-              Please review the AI synthesis and recommendations. 
-              Confirm if the findings align with your clinical judgment.
+              Please review the AI synthesis and the source document. 
+              Confirm if you will accept this appointment request.
             </p>
             
             <div className="annotation-box">
               <label>Doctor's Notes (Optional)</label>
-              <textarea placeholder="Add any specific instructions or corrections to the AI report..."></textarea>
+              <textarea placeholder="Add any specific instructions for the patient..."></textarea>
             </div>
 
             {selectedItem && verificationStatus[selectedItem.token] ? (
               <div className={`status-alert ${verificationStatus[selectedItem.token]}`}>
                 {verificationStatus[selectedItem.token] === 'approved' ? (
-                  <><Check size={20} /> Report Approved & Sent to Patient</>
+                  <><Check size={20} /> Appointment Confirmed</>
                 ) : (
-                  <><X size={20} /> Report Rejected. AI flagged for retraining.</>
+                  <><X size={20} /> Appointment Denied</>
                 )}
               </div>
             ) : (
@@ -258,14 +258,14 @@ const DoctorPortal = () => {
                   onClick={() => handleVerify('rejected')}
                   disabled={!selectedItem || loading}
                 >
-                  <X size={20} /> Reject Findings
+                  <X size={20} /> Deny Appointment
                 </button>
                 <button 
                   className="btn-approve"
                   onClick={() => handleVerify('approved')}
                   disabled={!selectedItem || loading}
                 >
-                  <Check size={20} /> Approve Report
+                  <Check size={20} /> Approve Appointment
                 </button>
               </div>
             )}
