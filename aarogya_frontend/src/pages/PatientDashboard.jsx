@@ -17,7 +17,6 @@ const PatientDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [sharing, setSharing] = useState(null);
 
-  const [emailPrompt, setEmailPrompt] = useState(null);
   const [emailInput, setEmailInput] = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
 
@@ -103,9 +102,51 @@ const PatientDashboard = () => {
   return (
     <div className="dashboard-page">
       <div className="container dashboard-container">
-        <div className="dashboard-header">
-          <h2>Patient Dashboard</h2>
-          <p>Upload your medical reports for instant AI analysis.</p>
+        <div className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h2>Patient Dashboard</h2>
+            <p>Upload your medical reports for instant AI analysis.</p>
+          </div>
+          
+          <div className="email-update-section glass-card" style={{ padding: '1rem', width: '320px' }}>
+            <h4 style={{ fontSize: '0.9rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Contact Email
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: 'normal' }}>(Required for Booking)</span>
+            </h4>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input 
+                type="email" 
+                value={emailInput}
+                onChange={e => setEmailInput(e.target.value)}
+                placeholder="Update email..."
+                style={{ 
+                  flex: 1, padding: '0.5rem', borderRadius: '6px', 
+                  border: '1px solid rgba(255,255,255,0.2)', 
+                  background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.85rem' 
+                }}
+              />
+              <button 
+                className="btn-primary" 
+                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                disabled={emailLoading}
+                onClick={async () => {
+                  if (!emailInput) return toast.error("Please enter an email");
+                  setEmailLoading(true);
+                  try {
+                    await apiClient.post('/auth/update-email/', { email: emailInput }, { headers: { Authorization: `Bearer ${token}` } });
+                    toast.success("Email updated successfully!");
+                    setEmailInput("");
+                  } catch (err) {
+                    toast.error(getApiErrorMessage(err) || "Failed to update email.");
+                  } finally {
+                    setEmailLoading(false);
+                  }
+                }}
+              >
+                {emailLoading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="dashboard-grid">
@@ -281,7 +322,7 @@ const PatientDashboard = () => {
                                     fetchAppointments();
                                   } catch (err) {
                                     if (err.response?.status === 400 && err.response.data?.error === "Please add email before booking") {
-                                      setEmailPrompt({ doctor_id: doc.id, report_id: result.report_id, doctor_name: doc.name });
+                                      toast.error("Please add an email in the top right before booking.");
                                     } else {
                                       toast.error(err.response?.data?.error || "Failed to book appointment.");
                                     }
@@ -388,78 +429,11 @@ const PatientDashboard = () => {
         />
       )}
 
-      {emailPrompt && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999,
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          backdropFilter: 'blur(4px)'
-        }}>
-          <div className="glass-card" style={{ width: '400px', padding: '2rem' }}>
-            <h3 style={{ marginBottom: '1rem' }}>Email Required</h3>
-            <p style={{marginBottom: '1.5rem', color: 'var(--text-light)', lineHeight: '1.5'}}>
-              Please provide your email address to receive status updates for your appointment with <strong>Dr. {emailPrompt.doctor_name}</strong>.
-            </p>
-            <input 
-              type="email" 
-              value={emailInput}
-              onChange={e => setEmailInput(e.target.value)}
-              placeholder="your.email@example.com"
-              className="w-100 mb-3"
-              style={{ 
-                padding: '0.75rem', 
-                borderRadius: '8px', 
-                border: '1px solid rgba(255,255,255,0.2)', 
-                background: 'rgba(255,255,255,0.05)', 
-                color: '#fff',
-                marginBottom: '1.5rem'
-              }}
-            />
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button 
-                className="btn-outline" 
-                onClick={() => setEmailPrompt(null)}
-                style={{ padding: '0.5rem 1rem' }}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn-primary" 
-                disabled={emailLoading}
-                onClick={async () => {
-                  if (!emailInput) return toast.error("Please enter an email");
-                  setEmailLoading(true);
-                  try {
-                    // Save email
-                    await axios.post(`${API_BASE_URL}/auth/update-email/`, { email: emailInput }, { headers: { Authorization: `Bearer ${token}` } });
-                    
-                    // Retry booking
-                    const prebookRes = await axios.post(`${API_BASE_URL}/bookings/prebook/`, {
-                      doctor_id: emailPrompt.doctor_id,
-                      report_id: emailPrompt.report_id
-                    }, { headers: { Authorization: `Bearer ${token}` } });
-                    
-                    const appointmentId = prebookRes.data.appointment_id;
-                    await axios.post(`${API_BASE_URL}/share/${appointmentId}/`, {}, {
-                      headers: { Authorization: `Bearer ${token}` }
-                    });
-                    
-                    toast.success(`Appointment requested with Dr. ${emailPrompt.doctor_name}!`);
-                    setEmailPrompt(null);
-                    fetchAppointments();
-                  } catch (err) {
-                    toast.error(err.response?.data?.error || "Failed to update email or book appointment.");
-                  } finally {
-                    setEmailLoading(false);
-                  }
-                }}
-                style={{ padding: '0.5rem 1.5rem' }}
-              >
-                {emailLoading ? "Saving..." : "Save & Book"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {panelOpen && (
+        <AgentReasoningPanel 
+          traces={result.reasoning_traces} 
+          onClose={() => setPanelOpen(false)} 
+        />
       )}
     </div>
   );
