@@ -5,7 +5,7 @@ import { Check, X, FileText, UserCircle, List } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './DoctorPortal.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api`;
 
 const DoctorPortal = () => {
   const { token, logout, user } = useAuth();
