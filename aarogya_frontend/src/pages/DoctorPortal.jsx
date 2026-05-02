@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Check, X, FileText, UserCircle, List } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { apiClient } from '../lib/apiClient';
 import './DoctorPortal.css';
-
-const baseUrl = import.meta.env.PROD ? (import.meta.env.VITE_API_BASE_URL || '') : 'http://localhost:8000';
-const API_BASE_URL = `${baseUrl}/api`;
 
 const DoctorPortal = () => {
   const { token, logout, user } = useAuth();
@@ -28,7 +25,7 @@ const DoctorPortal = () => {
 
   const checkProfile = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/doctors/profile/`, {
+      const res = await apiClient.get('/doctors/profile/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(res.data);
@@ -46,7 +43,7 @@ const DoctorPortal = () => {
     e.preventDefault();
     setSetupLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/doctors/create-profile/`, setupForm, {
+      await apiClient.post('/doctors/create-profile/', setupForm, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Profile created successfully!");
@@ -61,7 +58,7 @@ const DoctorPortal = () => {
 
   const fetchPendingVerifications = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/pending/`, {
+      const res = await apiClient.get('/pending/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingList(res.data);
@@ -80,7 +77,7 @@ const DoctorPortal = () => {
     setLoading(true);
     try {
       // Hit the actual backend endpoint, though token is mock so it will likely 404
-      await axios.post(`${API_BASE_URL}/verify/${selectedItem.token}/`, { action }, {
+      await apiClient.post(`/verify/${selectedItem.token}/`, { action }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`Appointment ${action} successfully!`);

@@ -1,8 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { apiClient } from '../lib/apiClient';
 
-const baseUrl = import.meta.env.PROD ? (import.meta.env.VITE_API_BASE_URL || '') : 'http://localhost:8000';
-const API = `${baseUrl}/api`;
 const AuthContext = createContext(null);
 
 export const useAuth = () => useContext(AuthContext);
@@ -25,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchMe = async (accessToken) => {
     try {
-      const res = await axios.get(`${API}/auth/me/`, {
+      const res = await apiClient.get('/auth/me/', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setUser(res.data);
@@ -40,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (username, password) => {
-    const res = await axios.post(`${API}/auth/login/`, { username, password });
+    const res = await apiClient.post('/auth/login/', { username, password });
     const { access, role } = res.data;
     localStorage.setItem('aarogya_token', access);
     setToken(access);
@@ -49,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (username, password, role) => {
-    const res = await axios.post(`${API}/auth/register/`, { username, password, role });
+    const res = await apiClient.post('/auth/register/', { username, password, role });
     const { access, role: assignedRole } = res.data;
     localStorage.setItem('aarogya_token', access);
     setToken(access);

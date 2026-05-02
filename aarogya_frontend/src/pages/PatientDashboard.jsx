@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { UploadCloud, FileText, CheckCircle, BrainCircuit, Share2, Clock, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AgentReasoningPanel from '../components/AgentReasoningPanel';
 import AnimatedDNA from '../components/AnimatedDNA';
 import { useAuth } from '../hooks/useAuth';
+import { apiClient, getApiErrorMessage } from '../lib/apiClient';
 import './PatientDashboard.css';
-
-const baseUrl = import.meta.env.PROD ? (import.meta.env.VITE_API_BASE_URL || '') : 'http://localhost:8000';
-const API_BASE_URL = `${baseUrl}/api`;
 
 const PatientDashboard = () => {
   const { token } = useAuth();
@@ -29,7 +26,7 @@ const PatientDashboard = () => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/reports/`, {
+      const res = await apiClient.get('/reports/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setHistory(res.data);
@@ -40,7 +37,7 @@ const PatientDashboard = () => {
 
   const fetchAppointments = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/bookings/`, {
+      const res = await apiClient.get('/bookings/', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAppointments(res.data);
@@ -84,11 +81,8 @@ const PatientDashboard = () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/reports/upload/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await apiClient.post('/reports/upload/', formData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setResult(response.data);
       toast.success("Report analyzed successfully!");
@@ -96,7 +90,7 @@ const PatientDashboard = () => {
       fetchHistory(); // Refresh list
     } catch (error) {
       console.error("Error uploading file", error);
-      toast.error("Failed to upload report. Please check the file and try again.");
+      toast.error(getApiErrorMessage(error) || "Failed to upload report. Please check the file and try again.");
     } finally {
       setLoading(false);
     }
@@ -267,7 +261,7 @@ const PatientDashboard = () => {
                                   setSharing(doc.id);
                                   try {
                                     // 1. Create Appointment (PreBook)
-                                    const prebookRes = await axios.post(`${API_BASE_URL}/bookings/prebook/`, {
+                                    const prebookRes = await apiClient.post('/bookings/prebook/', {
                                       doctor_id: doc.id,
                                       report_id: result.report_id
                                     }, { headers: { Authorization: `Bearer ${token}` } });
@@ -275,7 +269,7 @@ const PatientDashboard = () => {
                                     const appointmentId = prebookRes.data.appointment_id;
 
                                     // 2. Share with Doctor (Verification)
-                                    const shareRes = await axios.post(`${API_BASE_URL}/share/${appointmentId}/`, {}, {
+                                    await apiClient.post(`/share/${appointmentId}/`, {}, {
                                       headers: { Authorization: `Bearer ${token}` }
                                     });
                                     

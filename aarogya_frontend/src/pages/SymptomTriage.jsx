@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
+import { apiClient, getApiErrorMessage } from '../lib/apiClient';
 import './SymptomTriage.css';
-
-const baseUrl = import.meta.env.PROD ? (import.meta.env.VITE_API_BASE_URL || '') : 'http://localhost:8000';
-const API_BASE_URL = `${baseUrl}/api`;
 
 const SymptomTriage = () => {
   const { token } = useAuth();
@@ -42,7 +39,7 @@ const SymptomTriage = () => {
         payload.session_id = sessionId;
       }
 
-      const response = await axios.post(`${API_BASE_URL}/symptoms/chat/`, payload, {
+      const response = await apiClient.post('/symptoms/chat/', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -54,7 +51,7 @@ const SymptomTriage = () => {
 
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to connect to triage agent. Please try again.");
+      toast.error(getApiErrorMessage(error) || "Failed to connect to triage agent. Please try again.");
       setMessages(prev => [...prev, { id: Date.now(), text: "Sorry, I encountered an error connecting to the agent.", sender: 'bot', isError: true }]);
     } finally {
       setLoading(false);
