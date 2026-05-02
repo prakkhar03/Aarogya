@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -104,7 +104,8 @@ WSGI_APPLICATION = 'aarogya_backend.wsgi.application'
 # }
 
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
