@@ -14,6 +14,8 @@ def get_tokens(user):
 
 
 
+
+
 class RegisterView(APIView):
 
     def post(self, request):
@@ -22,22 +24,23 @@ class RegisterView(APIView):
         role = request.data.get("role", UserProfile.PATIENT)
 
         if not username or not password:
-            return Response({"error": "username and password are required"}, status=400)
-
-        if role not in (UserProfile.PATIENT, UserProfile.DOCTOR):
-            return Response({"error": "invalid role"}, status=400)
+            return Response({"error": "username and password required"}, status=400)
 
         if User.objects.filter(username=username).exists():
-            return Response({"error": "username already taken"}, status=400)
+            return Response({"error": "username already exists"}, status=400)
 
-     
+        
         user = User.objects.create_user(username=username, password=password)
 
        
-        profile = UserProfile.objects.create(
+        profile, created = UserProfile.objects.get_or_create(
             user=user,
-            role=role
+            defaults={"role": role}
         )
+
+        if not created:
+            profile.role = role
+            profile.save()
 
         tokens = get_tokens(user)
 
@@ -45,8 +48,6 @@ class RegisterView(APIView):
             "access": tokens["access"],
             "role": profile.role
         }, status=201)
-
-
 
 class LoginView(APIView):
 
