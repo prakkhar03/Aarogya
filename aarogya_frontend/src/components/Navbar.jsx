@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Menu, X, LogOut } from 'lucide-react';
+import { Activity, Menu, X, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import './Navbar.css';
 
@@ -71,6 +71,13 @@ const Navbar = () => {
               <Link to="/doctor" className="btn-outline" style={{ padding: '0.5rem 1rem', marginRight: '0.75rem' }}>
                 Doctor Portal
               </Link>
+              <Link
+                to="/admin"
+                title="Prompt Config Panel"
+                style={{ display: 'flex', alignItems: 'center', padding: '0.5rem', marginRight: '0.5rem', color: 'var(--text-light)', opacity: 0.7 }}
+              >
+                <Settings size={18} />
+              </Link>
               <Link to="/auth" className="btn-primary" style={{ padding: '0.5rem 1.5rem' }}>
                 Login
               </Link>
@@ -104,6 +111,13 @@ const Navbar = () => {
                 Login
               </Link>
             )}
+            <Link
+              to="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem', color: 'var(--text-light)', fontSize: '0.9rem' }}
+            >
+              <Settings size={16} /> Prompt Config Panel
+            </Link>
           </div>
         </div>
       )}

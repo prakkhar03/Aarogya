@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 
 from bookings.models import Appointment
 from utils.permissions import IsDoctor, IsPatient
 
-from .models import DoctorVerification
+from .models import DoctorVerification, PromptConfig
 
 
 class ShareView(APIView):
@@ -70,3 +71,28 @@ class PendingVerificationsView(APIView):
             })
             
         return Response(data)
+
+class PromptConfigListView(APIView):
+    """Public: list all prompt config names."""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        configs = PromptConfig.objects.all().values('name', 'updated_at')
+        return Response(list(configs))
+
+
+class PromptConfigDetailView(APIView):
+    """Public: get or update a prompt config by name."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, name):
+        config = get_object_or_404(PromptConfig, name=name)
+        return Response({'name': config.name, 'content': config.content, 'updated_at': config.updated_at})
+
+    def put(self, request, name):
+        content = request.data.get('content', '')
+        config, _ = PromptConfig.objects.update_or_create(
+            name=name,
+            defaults={'content': content}
+        )
+        return Response({'name': config.name, 'content': config.content, 'updated_at': config.updated_at})

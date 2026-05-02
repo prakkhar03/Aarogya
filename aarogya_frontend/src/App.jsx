@@ -10,6 +10,7 @@ import AuthPage from './pages/AuthPage';
 import SymptomTriage from './pages/SymptomTriage';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorPortal from './pages/DoctorPortal';
+import AdminPanel from './pages/AdminPanel';
 import './App.css';
 
 const HIDE_NAVBAR = ['/auth', '/doctor'];
@@ -54,6 +55,9 @@ const AppContent = () => {
             <DoctorPortal />
           </ProtectedRoute>
         } />
+
+        {/* Public prompt config panel — no auth required */}
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </>
   );
