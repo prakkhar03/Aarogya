@@ -13,6 +13,7 @@ def get_tokens(user):
     return {"access": str(refresh.access_token)}
 
 
+
 class RegisterView(APIView):
 
     def post(self, request):
@@ -29,18 +30,22 @@ class RegisterView(APIView):
         if User.objects.filter(username=username).exists():
             return Response({"error": "username already taken"}, status=400)
 
+     
         user = User.objects.create_user(username=username, password=password)
 
-        if role != UserProfile.PATIENT:
-            user.profile.role = role
-            user.profile.save()
+       
+        profile = UserProfile.objects.create(
+            user=user,
+            role=role
+        )
 
         tokens = get_tokens(user)
 
         return Response({
             "access": tokens["access"],
-            "role": user.profile.role
+            "role": profile.role
         }, status=201)
+
 
 
 class LoginView(APIView):
@@ -56,7 +61,7 @@ class LoginView(APIView):
 
         tokens = get_tokens(user)
 
-        role = getattr(getattr(user, "profile", None), "role", None)
+        role = getattr(user.profile, "role", None)
 
         return Response({
             "access": tokens["access"],
@@ -64,11 +69,12 @@ class LoginView(APIView):
         })
 
 
+
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        role = getattr(getattr(request.user, "profile", None), "role", None)
+        role = getattr(request.user.profile, "role", None)
 
         return Response({
             "id": request.user.id,
