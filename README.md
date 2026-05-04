@@ -218,7 +218,7 @@ These features are fully designed and documented but deferred from the hackathon
 | **Model**       | Claude Sonnet                                                                                                   |
 | **Inputs**      | Lab PDF / image (OCR-extracted text), patient history from Neo4j                                                |
 | **Outputs**     | Structured findings card, flagged abnormalities with severity, doctor-verification share link                   |
-| **Tools**       | PDF/OCR extraction, PubMed RAG (Pinecone), MedlinePlus API, ICD-10 lookup, Neo4j patient graph read             |
+| **Tools**       | PDF/OCR extraction, PubMed RAG (Pinecone), MedlinePlus API, ICD-10 lookup                                       |
 | **Prompt File** | `config/prompts.yaml` → `report_analysis_agent`                                                                |
 
 ### 🚨 Triage Agent (Symptom Interpretation)
@@ -267,18 +267,14 @@ These features are fully designed and documented but deferred from the hackathon
 | **Charts**              | Recharts                                | Health timeline visualisation                  |
 | **Animations**          | Framer Motion                           | Agent collaboration visualisation              |
 | **Real-time**           | SSE (Server-Sent Events)                | Live agent reasoning stream                    |
-| **API Gateway**         | Express.js / Node.js                    | Auth, file uploads, WebSocket/SSE bridge       |
 | **Orchestration**       | Python FastAPI + LangGraph              | Agent state machine, RAG retrieval             |
 | **Agent Framework**     | CrewAI (collaboration patterns)         | Agent-to-agent coordination                    |
-| **Patient Graph**       | Neo4j                                   | Longitudinal patient data, Cypher queries      |
 | **Vector DB**           | Pinecone                                | Medical RAG (PubMed, MedlinePlus, ICD-10)      |
 | **Relational DB**       | PostgreSQL                              | Users, audit logs, doctor verification records |
 | **Cache / Blackboard**  | Redis                                   | Agent intermediate findings, SSE pub-sub       |
 | **LLM (complex)**       | Claude Sonnet                           | Orchestrator, Report Analysis Agent            |
 | **LLM (fast)**          | Llama 3.1 8B via Groq                   | Triage Agent, Booking Agent                    |
 | **OCR**                 | Tesseract + Google Vision API           | PDF and handwritten document extraction        |
-| **Voice**               | Voice calling provider                  | Real outbound appointment booking calls        |
-| **Translation**         | Sarvam AI / Bhashini                    | Hindi input and output                         |
 | **Voice Transcription** | OpenAI Whisper                          | Hindi voice-to-text                            |
 | **Health Standards**    | HAPI FHIR test server                   | Clinician-compatible structured output         |
 
@@ -303,14 +299,13 @@ Pinecone Index: aarogya-medical-rag
 ```
 1. Patient uploads lab PDF via React frontend
         │
-2. Express Gateway stores file, triggers FastAPI orchestrator
+2. Express Gateway stores file, triggers django orchestrator
         │
 3. Orchestrator classifies intent → "report_analysis"
         │
 4. Report Analysis Agent fires:
    ├── OCR text extraction (Tesseract / Google Vision)
    ├── Pinecone RAG query (clinical context for each flagged value)
-   └── Neo4j query (patient's existing conditions and medication history)
         │
 5. Agent publishes findings to Redis blackboard
         │
@@ -329,7 +324,7 @@ Pinecone Index: aarogya-medical-rag
    ├── Annotates flagged sections
    └── Clicks Approve / Flag for Review
         │
-10. Verification stored in Postgres + Neo4j
+10. Verification stored in Postgres 
     Patient dashboard updates: ✅ Verified by Dr. [Name]
 ```
 
@@ -386,7 +381,7 @@ aarogya-ai/
 │   ├── .env.example
 │   └── package.json
 │
-├── gateway/                           # Express.js API Gateway (Node)
+├── gateway/                           
 │   ├── routes/
 │   │   ├── auth.js                    # JWT auth routes
 │   │   ├── upload.js                  # File upload (multer)
@@ -420,7 +415,6 @@ aarogya-ai/
 │   │   ├── icd10_tool.py              # ICD-10 API wrapper
 │   │   └── voice_call_tool.py         # Voice call provider wrapper
 │   ├── db/
-│   │   ├── neo4j_client.py            # Neo4j connection + Cypher helpers
 │   │   └── postgres_client.py         # Postgres connection + ORM models
 │   ├── tests/
 │   │   ├── test_report_agent.py       # Unit tests for Report Agent
@@ -456,9 +450,7 @@ Python >= 3.11
 - Groq API key (Llama 3.1 8B)
 - Voice calling provider account
 - Pinecone account
-- Neo4j Aura (free tier works)
 - Google Cloud (Vision API for OCR)
-- Sarvam AI / Bhashini (Hindi translation)
 ```
 
 ### Manual Setup
@@ -502,19 +494,11 @@ PINECONE_API_KEY=...
 PINECONE_ENVIRONMENT=us-east-1-aws
 PINECONE_INDEX_NAME=aarogya-medical-rag
 
-# ── Patient Graph ─────────────────────────────────────────────────
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=yourpassword
-
 # ── Relational DB ─────────────────────────────────────────────────
 POSTGRES_URI=postgresql://user:password@localhost:5432/aarogya
 
 # ── Cache / Blackboard ────────────────────────────────────────────
 REDIS_URL=redis://localhost:6379
-
-# ── Communication ─────────────────────────────────────────────────
-WHATSAPP_BUSINESS_NUMBER=whatsapp:+91...
 
 # ── OCR ───────────────────────────────────────────────────────────
 GOOGLE_VISION_API_KEY=...             # Primary OCR for handwritten docs
@@ -744,7 +728,6 @@ Deployment is not mandatory but earns bonus points.
 # Frontend → Render Static Site
 # Gateway → Render Web Service (Node)
 # Orchestration → Render Web Service (Python)
-# Neo4j → Neo4j Aura Free Tier
 # Postgres → Render Postgres
 # Redis → Render Redis
 # Pinecone → Pinecone cloud (already managed)
@@ -904,7 +887,7 @@ class DoctorRecommendation(BaseModel):
 | -------- | ------- | ------------------------------------------------ |
 | [Prakhar N] | @prakkhar03   | Orchestrator + LangGraph state machine + RAG pipeline|
 | [Prakhar]   | @prakhar-174  | Frontend + Agent Reasoning Panel + Doctor Portal     |
-| [Kshitiz]   | @kshitiz-2027 | Report Analysis Agent + Triage Agent + Booking Agent |
+| [Kshitiz]   | @Kshitiz-2027 | Report Analysis Agent + Triage Agent + Booking Agent |
 
 ---
 
