@@ -4,7 +4,7 @@
 
 [![Veersa Hackathon 2027](https://img.shields.io/badge/Veersa%20Hackathon-2027-blue)](https://forms.office.com/r/wax7a55k6n)
 [![Theme](https://img.shields.io/badge/Theme-Agentic%20AI%20Systems-teal)](/)
-[![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20LangGraph%20%7C%20Node.js-green)](/)
+[![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20LangGraph%20%7C%20Django-green)](/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](/)
 
 ---
