@@ -422,19 +422,11 @@ const PatientDashboard = () => {
         )}
       </div>
 
-      {panelOpen && (
-        <AgentReasoningPanel 
-          traces={result.reasoning_traces} 
-          onClose={() => setPanelOpen(false)} 
-        />
-      )}
-
-      {panelOpen && (
-        <AgentReasoningPanel 
-          traces={result.reasoning_traces} 
-          onClose={() => setPanelOpen(false)} 
-        />
-      )}
+      <AgentReasoningPanel
+        data={result?.analysis}
+        isOpen={panelOpen}
+        onClose={() => setPanelOpen(false)}
+      />
     </div>
   );
 };
